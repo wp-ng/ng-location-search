@@ -1,0 +1,29 @@
+{
+  "name": "location-search",
+  "version": "1.0.0",
+  "author": "Auban le Grelle <auban@viamonkey.com>",
+  "homepage": "https://redcastor.io",
+  "description": "",
+  "license": "MIT",
+  "keywords": [
+    "$location",
+    "search",
+    "angular"
+  ],
+  "main": [
+    "dist/location-search.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "**/*.txt",
+    ".jscsrc",
+    ".jshintrc",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.6.x"
+  }
+}
