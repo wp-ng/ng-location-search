@@ -1,14 +1,13 @@
 (function(angular){
     'use strict';
 
-    angular.module('ngLocationSearch', []).directive('ngLocationSearch', ['$timeout', '$location', '$window', '$parse', function ($timeout, $location, $window, $parse) {
+    angular.module('ngLocationSearch', []).directive('ngLocationSearch', ['$log', '$timeout', '$location', '$window', '$parse', '$httpParamSerializer', function ($log, $timeout, $location, $window, $parse, $httpParamSerializer) {
         return {
             restrict: "A",
             require: ['?ngModel', '?^form'],
             link: function (scope, elem, attrs, Ctrl) {
 
-                var search_keys = scope.$eval(attrs.ngLocationSearch);
-                search_keys = angular.isArray(search_keys) ? search_keys : [attrs.ngLocationSearch];
+                var search_keys;
 
                 /**
                  * Set the controllers for model and form
@@ -23,7 +22,12 @@
                  * @param url
                  */
                 function trailling_slash (url) {
-                    return url.replace(/\/$/, '');
+
+                    if ( angular.isString(url) ) {
+                        return url.replace(/\/$/, '');
+                    }
+
+                    return false;
                 }
 
 
@@ -32,7 +36,7 @@
                  *
                  * @param value
                  */
-                function setLocationSearch(value) {
+                function parseLocationSearch(value) {
 
                     if (!value) {
                         return;
@@ -40,8 +44,8 @@
 
                     var new_search = {};
                     var reset_search = scope.$eval(attrs.ngLocationSearchReset);
-                    var hashUrl = $window.location.hash.replace($location.url(), '');
-                    var absUrl = trailling_slash($window.location.href.replace($window.location.hash, ''));
+                    var location_href = trailling_slash(attrs.ngLocationSearchUrl);
+                    var abs_url = trailling_slash($window.location.href.replace($window.location.hash, ''));
 
                     //Deserializes a JSON search string.
                     try {
@@ -73,25 +77,25 @@
                         new_search = angular.extend({}, current_search, new_search);
                     }
 
-
-                    $timeout(function() {
-                        $location.search(new_search);
-                    });
-
                     //Redirect to search url
-                    if(attrs.ngLocationSearchUrl && angular.isString(attrs.ngLocationSearchUrl)) {
-                        var location_href = trailling_slash(attrs.ngLocationSearchUrl);
+                    if (angular.isString(location_href) && location_href !== abs_url) {
 
-                        if (location_href !== absUrl) {
+                        var path_url = $location.path();
+                        var hash_url = trailling_slash($window.location.hash.replace($location.url(), ''));
+                        var param_url = $httpParamSerializer(new_search);
 
-                            var new_href = location_href + '/' + trailling_slash(hashUrl) + $location.url();
+                        path_url = path_url ? '/' : '';
+                        param_url = param_url ? '?' + param_url : '';
+                        var new_href = location_href + '/' + hash_url + path_url + param_url ;
 
-                            $timeout(function() {
-                                $location.search({}).replace();
-                            });
+                        $window.location.href = new_href;
 
-                            $window.location.href = new_href;
-                        }
+                        $log.debug(new_href);
+                    }
+                    else {
+                        $timeout(function() {
+                            $location.search(new_search);
+                        });
                     }
                 }
 
@@ -99,6 +103,8 @@
                 //Only if attribute is set
                 if (attrs.ngLocationSearch && (modelCtrl || formCtrl)) {
 
+                    search_keys = scope.$eval(attrs.ngLocationSearch);
+                    search_keys = angular.isArray(search_keys) ? search_keys : [attrs.ngLocationSearch];
                     var search = null;
 
                     //Set the model change from location search object.
@@ -166,7 +172,7 @@
 
                                 if (newVal !== oldVal) {
 
-                                    setLocationSearch(newVal);
+                                    parseLocationSearch(newVal);
                                 }
                             }
                         );
@@ -192,7 +198,7 @@
                             var submit = scope.$eval(attrs.ngSubmit);
 
                             if (submit) {
-                                setLocationSearch(submit);
+                                parseLocationSearch(submit);
                             }
                         });
 
