@@ -1,5 +1,5 @@
 {
-  "name": "location-search",
+  "name": "ng-location-search",
   "version": "1.0.0",
   "author": "Auban le Grelle <auban@viamonkey.com>",
   "homepage": "https://redcastor.io",
@@ -11,7 +11,7 @@
     "angular"
   ],
   "main": [
-    "dist/location-search.js"
+    "dist/ng-location-search.js"
   ],
   "ignore": [
     "**/.*",

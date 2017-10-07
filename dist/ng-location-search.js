@@ -1,12 +1,12 @@
 (function(angular) {
     "use strict";
-    angular.module("locationSearch", []).directive("locationSearch", [ "$timeout", "$location", "$window", "$parse", function($timeout, $location, $window, $parse) {
+    angular.module("ngLocationSearch", []).directive("ngLocationSearch", [ "$timeout", "$location", "$window", "$parse", function($timeout, $location, $window, $parse) {
         return {
             restrict: "A",
             require: [ "?ngModel", "?^form" ],
             link: function(scope, elem, attrs, Ctrl) {
-                var search_keys = scope.$eval(attrs.locationSearch);
-                search_keys = angular.isArray(search_keys) ? search_keys : [ attrs.locationSearch ];
+                var search_keys = scope.$eval(attrs.ngLocationSearch);
+                search_keys = angular.isArray(search_keys) ? search_keys : [ attrs.ngLocationSearch ];
                 var modelCtrl = Ctrl[0];
                 var formCtrl = Ctrl[1];
                 function trailling_slash(url) {
@@ -17,7 +17,7 @@
                         return;
                     }
                     var new_search = {};
-                    var reset_search = scope.$eval(attrs.locationSearchReset);
+                    var reset_search = scope.$eval(attrs.ngLocationSearchReset);
                     var hashUrl = $window.location.hash.replace($location.url(), "");
                     var absUrl = trailling_slash($window.location.href.replace($window.location.hash, ""));
                     try {
@@ -40,8 +40,8 @@
                     $timeout(function() {
                         $location.search(new_search);
                     });
-                    if (attrs.locationSearchUrl && angular.isString(attrs.locationSearchUrl)) {
-                        var location_href = trailling_slash(attrs.locationSearchUrl);
+                    if (attrs.ngLocationSearchUrl && angular.isString(attrs.ngLocationSearchUrl)) {
+                        var location_href = trailling_slash(attrs.ngLocationSearchUrl);
                         if (location_href !== absUrl) {
                             var new_href = location_href + "/" + trailling_slash(hashUrl) + $location.url();
                             $timeout(function() {
@@ -51,7 +51,7 @@
                         }
                     }
                 }
-                if (attrs.locationSearch && (modelCtrl || formCtrl)) {
+                if (attrs.ngLocationSearch && (modelCtrl || formCtrl)) {
                     var search = null;
                     var changeModel = function(loc_search) {
                         search = search_keys.length > 1 ? {} : null;
@@ -118,4 +118,4 @@
         };
     } ]);
 })(window.angular);
-//# sourceMappingURL=location-search.js.map
+//# sourceMappingURL=ng-location-search.js.map

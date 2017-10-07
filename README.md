@@ -6,11 +6,11 @@ Angular Location Search directive.
 <h4>Installing</h4>
 
 ```
-bower install location-search
+bower install ng-location-search
 ```
 
 ```javascript
-angular('yourAngularApp',['locationSerach']);
+angular('yourAngularApp',['ngLocationSerach']);
 ```
 
 <h4>Usage/Example Form</h4>
