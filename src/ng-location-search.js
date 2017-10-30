@@ -38,10 +38,6 @@
                  */
                 function parseLocationSearch(value) {
 
-                    if (!value) {
-                        return;
-                    }
-
                     var new_search = {};
                     var reset_search = scope.$eval(attrs.ngLocationSearchReset);
                     var location_href = trailling_slash(attrs.ngLocationSearchUrl);
