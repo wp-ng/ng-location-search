@@ -10,7 +10,7 @@ bower install ng-location-search
 ```
 
 ```javascript
-angular('yourAngularApp',['ngLocationSerach']);
+angular('yourAngularApp',['ngLocationSearch']);
 ```
 
 <h4>Usage/Example Form</h4>
