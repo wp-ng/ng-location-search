@@ -88,12 +88,12 @@
 
                         if (!$location.$$html5 || is_abs_url) {
 
-                            path_url = path_url ? '/' : '';
                             param_url = param_url ? '?' + param_url : '';
                             new_href = location_href + param_url;
 
                             if (!is_internal_url && is_abs_url) {
-                                new_href = location_href + '/' + hash_url + path_url + param_url ;
+                                path_url = path_url && !$location.$$html5 ? '/' : '';
+                                new_href = location_href + hash_url + path_url + param_url ;
                             }
 
                             $window.location.href = new_href;
