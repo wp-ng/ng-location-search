@@ -161,25 +161,25 @@
 
                     //Set the model change from location search object.
                     var changeForm = function (loc_search) {
-                        var fields = scope.$eval(attrs.ngSubmit);
 
-                        if (!fields && angular.isObject(fields)) {
-                            return;
+                        if (search_keys.length > 0) {
+                            var fields = scope.$eval(attrs.ngSubmit);
+
+                            search = {};
+
+                            angular.forEach(search_keys, function(key, val) {
+                                if (angular.isDefined(loc_search[key])) {
+                                    search[key] = loc_search[key];
+                                }
+                            });
+
+                            fields = !angular.isObject(fields) ? {} : fields;
+                            search = angular.extend(fields, search);
+
+                            var getter = $parse(attrs.ngSubmit);
+                            var setter = getter.assign;
+                            setter(scope, search);
                         }
-
-                        if ( angular.isUndefined(scope[attrs.ngSubmit]) ) {
-                            scope[attrs.ngSubmit] = {};
-                        }
-
-                        //Find in url search params
-                        angular.forEach(search_keys, function (key, val) {
-
-                            if (angular.isDefined(loc_search[key])) {
-
-                                //Set default form value.
-                                scope[attrs.ngSubmit][key] = loc_search[key];
-                            }
-                        });
                     };
 
 
