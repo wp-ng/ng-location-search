@@ -19,9 +19,6 @@
                     var reset_search = scope.$eval(attrs.ngLocationSearchReset);
                     var location_href = trailling_slash(attrs.ngLocationSearchUrl);
                     var abs_url = trailling_slash($window.location.href.replace($window.location.hash, ""));
-                    var is_add_to_url = location_href.indexOf("/") === 0;
-                    var is_internal_url = location_href.indexOf("#!/") !== -1 || location_href.indexOf("#/") !== -1;
-                    var is_abs_url = location_href.indexOf($location.protocol()) === 0;
                     try {
                         var value_object = angular.fromJson(value);
                         value = value_object;
@@ -40,6 +37,9 @@
                         new_search = angular.extend({}, current_search, new_search);
                     }
                     if (angular.isString(location_href) && location_href !== abs_url) {
+                        var is_add_to_url = location_href.indexOf("/") === 0 ? false : true;
+                        var is_internal_url = location_href.indexOf("#!/") !== -1 || location_href.indexOf("#/") !== -1;
+                        var is_abs_url = location_href.indexOf($location.protocol()) === 0;
                         var path_url = $location.path();
                         var hash_url = trailling_slash($window.location.hash.replace($location.url(), ""));
                         var param_url = $httpParamSerializer(new_search);
@@ -56,9 +56,14 @@
                             $location.search(param_url);
                             scope.$apply();
                             if (is_add_to_url) {
-                                new_href = location_href;
+                                var _path_urls = path_url.split("/");
+                                if (_path_urls[_path_urls.length - 1] === location_href) {
+                                    new_href = path_url;
+                                } else {
+                                    new_href = path_url + "/" + location_href;
+                                }
                             } else {
-                                new_href = path_url + "/" + location_href;
+                                new_href = location_href;
                             }
                             $location.path(new_href);
                             scope.$apply();
