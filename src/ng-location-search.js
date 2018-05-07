@@ -203,7 +203,7 @@
                             },
                             function (newVal, oldVal) {
 
-                                if (newVal !== oldVal) {
+                                if (newVal !== oldVal && modelCtrl.$valid) {
 
                                     parseLocationSearch(newVal);
                                 }
@@ -229,8 +229,9 @@
                         //Event Submit Form
                         elem.on('submit', function() {
                             var submit = scope.$eval(attrs.ngSubmit);
+                            var form = scope.$eval(attrs.name);
 
-                            if (submit) {
+                            if (submit && (!form || form.$valid)) {
                                 parseLocationSearch(submit);
                             }
                         });

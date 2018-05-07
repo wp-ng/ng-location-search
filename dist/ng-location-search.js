@@ -115,7 +115,7 @@
                         scope.$watch(function() {
                             return modelCtrl.$modelValue;
                         }, function(newVal, oldVal) {
-                            if (newVal !== oldVal) {
+                            if (newVal !== oldVal && modelCtrl.$valid) {
                                 parseLocationSearch(newVal);
                             }
                         });
@@ -127,7 +127,8 @@
                     if (formCtrl) {
                         elem.on("submit", function() {
                             var submit = scope.$eval(attrs.ngSubmit);
-                            if (submit) {
+                            var form = scope.$eval(attrs.name);
+                            if (submit && (!form || form.$valid)) {
                                 parseLocationSearch(submit);
                             }
                         });
