@@ -39,6 +39,7 @@
                 function parseLocationSearch(value) {
 
                     var new_search = {};
+                    var is_replace_search = scope.$eval(attrs.ngLocationSearchReplace);
                     var reset_search = scope.$eval(attrs.ngLocationSearchReset);
                     var location_href = trailling_slash(attrs.ngLocationSearchUrl);
                     var abs_url = trailling_slash($window.location.href.replace($window.location.hash, ''));
@@ -101,7 +102,10 @@
                         else {
 
                             $location.search(param_url);
-                            scope.$apply();
+
+                            if (is_replace_search) {
+                                scope.$apply();
+                            }
 
                             if (is_add_to_url) {
 
