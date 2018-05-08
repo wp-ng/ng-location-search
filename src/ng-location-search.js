@@ -65,10 +65,15 @@
                             search_val = value;
                         }
 
-                        new_search[key] = search_val !== '' ? search_val : null;
+                        new_search[key] = search_val !== '' ? search_val.toString() : null;
                     });
 
                     var current_search = $location.search();
+
+                    //Exit if same as current url search
+                    if (angular.equals(new_search, current_search)) {
+                        return;
+                    }
 
                     if (!reset_search) {
                         new_search = angular.extend({}, current_search, new_search);
