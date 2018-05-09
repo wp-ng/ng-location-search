@@ -1,6 +1,6 @@
 (function(angular) {
     "use strict";
-    angular.module("ngLocationSearch", []).directive("ngLocationSearch", [ "$log", "$timeout", "$location", "$window", "$parse", "$httpParamSerializer", function($log, $timeout, $location, $window, $parse, $httpParamSerializer) {
+    angular.module("ngLocationSearch", []).directive("ngLocationSearch", [ "$rootScope", "$log", "$timeout", "$location", "$window", "$parse", "$httpParamSerializer", function($rootScope, $log, $timeout, $location, $window, $parse, $httpParamSerializer) {
         return {
             restrict: "A",
             require: [ "?ngModel", "?^form" ],
@@ -40,6 +40,7 @@
                     if (!reset_search) {
                         new_search = angular.extend({}, current_search, new_search);
                     }
+                    $rootScope.$broadcast("ngLocationSearchChangeStart", current_search, new_search);
                     if (angular.isString(location_href) && location_href !== abs_url) {
                         var is_add_to_url = location_href.indexOf("/") === 0 ? false : true;
                         var is_internal_url = location_href.indexOf("#!/") !== -1 || location_href.indexOf("#/") !== -1;
@@ -80,6 +81,7 @@
                             $location.search(new_search);
                         });
                     }
+                    $rootScope.$broadcast("ngLocationSearchChangeSuccess", current_search, new_search);
                 }
                 if (attrs.ngLocationSearch && (modelCtrl || formCtrl)) {
                     search_keys = scope.$eval(attrs.ngLocationSearch);
