@@ -31,7 +31,7 @@
                         } else if (angular.isString(value)) {
                             search_val = value;
                         }
-                        new_search[key] = search_val !== "" ? search_val.toString() : null;
+                        new_search[key] = search_val && search_val !== "" ? search_val.toString() : null;
                     });
                     var current_search = $location.search();
                     if (angular.equals(new_search, current_search)) {
