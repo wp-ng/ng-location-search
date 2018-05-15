@@ -34,13 +34,13 @@
                         new_search[key] = search_val && search_val !== "" ? search_val.toString() : null;
                     });
                     var current_search = $location.search();
-                    if (angular.equals(new_search, current_search)) {
-                        return;
-                    }
                     if (!reset_search) {
                         new_search = angular.extend({}, current_search, new_search);
                     }
-                    $rootScope.$broadcast("ngLocationSearchChangeStart", current_search, new_search);
+                    if (angular.equals(new_search, current_search)) {
+                        return;
+                    }
+                    $rootScope.$broadcast("ngLocationSearchChangeStart", new_search, current_search);
                     if (angular.isString(location_href) && location_href !== abs_url) {
                         var is_add_to_url = location_href.indexOf("/") === 0 ? false : true;
                         var is_internal_url = location_href.indexOf("#!/") !== -1 || location_href.indexOf("#/") !== -1;
@@ -76,12 +76,13 @@
                             scope.$apply();
                         }
                         $log.debug(new_href);
+                        $rootScope.$broadcast("ngLocationSearchChangeSuccess", new_search, current_search);
                     } else {
                         $timeout(function() {
                             $location.search(new_search);
+                            $rootScope.$broadcast("ngLocationSearchChangeSuccess", new_search, current_search);
                         });
                     }
-                    $rootScope.$broadcast("ngLocationSearchChangeSuccess", current_search, new_search);
                 }
                 if (attrs.ngLocationSearch && (modelCtrl || formCtrl)) {
                     search_keys = scope.$eval(attrs.ngLocationSearch);
@@ -125,6 +126,9 @@
                         }, function(newVal, oldVal) {
                             if (newVal !== oldVal && modelCtrl.$valid) {
                                 parseLocationSearch(newVal);
+                            } else {
+                                var model_name = attrs.name;
+                                $rootScope.$broadcast("ngLocationSearchChangeError", "model", model_name, modelCtrl);
                             }
                         });
                         scope.$on("$locationChangeStart", function(event, newUrl, oldUrl, newState, oldState) {
@@ -135,9 +139,12 @@
                     if (formCtrl) {
                         elem.on("submit", function() {
                             var submit = scope.$eval(attrs.ngSubmit);
-                            var form = scope.$eval(attrs.name);
+                            var form_name = attrs.name;
+                            var form = scope.$eval(form_name);
                             if (submit && (!form || form.$valid)) {
                                 parseLocationSearch(submit);
+                            } else {
+                                $rootScope.$broadcast("ngLocationSearchChangeError", "form", form_name, form);
                             }
                         });
                         scope.$on("$locationChangeStart", function(event, newUrl, oldUrl, newState, oldState) {
