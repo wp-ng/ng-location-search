@@ -15,7 +15,7 @@
                 require: ['?ngModel', '?^form'],
                 link: function (scope, elem, attrs, Ctrl) {
 
-                    var default_value = attrs.ngLocationSearchDefault || null;
+                    var default_value = attrs.ngLocationSearchDefault ? scope.$eval(attrs.ngLocationSearchDefault) : null;
                     var search_keys;
 
                     /**
