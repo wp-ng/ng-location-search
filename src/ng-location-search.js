@@ -121,8 +121,6 @@
                                 }
                                 else {
 
-                                    $location.search(param_url);
-
                                     if (is_replace_search) {
                                         scope.$apply();
                                     }
