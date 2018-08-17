@@ -118,8 +118,12 @@
                                     }
 
                                     $window.location.href = new_href;
+
+                                    $location.search(new_search);
                                 }
                                 else {
+
+                                    $location.search(param_url);
 
                                     if (is_replace_search) {
                                         scope.$apply();
@@ -146,7 +150,6 @@
                                 }
                             }
 
-                            $location.search(new_search);
                             $rootScope.$broadcast('ngLocationSearchChangeSuccess', new_search, current_search);
                         }, parseInt(delay_change, 10));
                     }
