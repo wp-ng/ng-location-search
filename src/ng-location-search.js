@@ -149,6 +149,9 @@
                                     scope.$apply();
                                 }
                             }
+                            else {
+                                $location.search(new_search);
+                            }
 
                             $rootScope.$broadcast('ngLocationSearchChangeSuccess', new_search, current_search);
                         }, parseInt(delay_change, 10));
