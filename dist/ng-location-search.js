@@ -9,9 +9,15 @@
                 var search_keys;
                 var modelCtrl = Ctrl[0];
                 var formCtrl = Ctrl[1];
-                function trailling_slash(url) {
+                function untrailling_slash(url) {
                     if (angular.isString(url)) {
                         return url.replace(/\/$/, "");
+                    }
+                    return false;
+                }
+                function trailling_slash(url) {
+                    if (angular.isString(url)) {
+                        return untrailling_slash(url) + "/";
                     }
                     return false;
                 }
@@ -19,8 +25,8 @@
                     var new_search = {};
                     var is_replace_search = scope.$eval(attrs.ngLocationSearchReplace);
                     var reset_search = scope.$eval(attrs.ngLocationSearchReset);
-                    var location_href = trailling_slash(attrs.ngLocationSearchUrl);
-                    var abs_url = trailling_slash($window.location.href.replace($window.location.hash, ""));
+                    var location_href = attrs.ngLocationSearchUrl;
+                    var abs_url = $window.location.href.replace($window.location.hash, "");
                     var delay_change = attrs.ngLocationSearchDelay || 0;
                     try {
                         var value_object = angular.fromJson(value);
@@ -33,7 +39,7 @@
                         } else if (angular.isString(value)) {
                             search_val = value;
                         }
-                        new_search[key] = search_val && search_val !== "" ? search_val.toString() : default_value;
+                        new_search[key] = search_val && search_val !== "" ? search_val.toString() : search_val === "" ? null : default_value;
                     });
                     var current_search = $location.search();
                     if (!reset_search) {
@@ -49,7 +55,7 @@
                             var is_internal_url = location_href.indexOf("#!/") !== -1 || location_href.indexOf("#/") !== -1;
                             var is_abs_url = location_href.indexOf($location.protocol()) === 0;
                             var path_url = $location.path();
-                            var hash_url = trailling_slash($window.location.hash.replace($location.url(), ""));
+                            var hash_url = untrailling_slash($window.location.hash.replace($location.url(), ""));
                             var param_url = $httpParamSerializer(new_search);
                             var new_href = "";
                             if (!$location.$$html5 || is_abs_url) {

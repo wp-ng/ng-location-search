@@ -30,10 +30,24 @@
                      *
                      * @param url
                      */
-                    function trailling_slash (url) {
+                    function untrailling_slash (url) {
 
                         if ( angular.isString(url) ) {
                             return url.replace(/\/$/, '');
+                        }
+
+                        return false;
+                    }
+
+                    /**
+                     * Trailling Slash Url
+                     *
+                     * @param url
+                     */
+                    function trailling_slash (url) {
+
+                        if ( angular.isString(url) ) {
+                            return untrailling_slash(url) + '/';
                         }
 
                         return false;
@@ -50,8 +64,8 @@
                         var new_search = {};
                         var is_replace_search = scope.$eval(attrs.ngLocationSearchReplace);
                         var reset_search = scope.$eval(attrs.ngLocationSearchReset);
-                        var location_href = trailling_slash(attrs.ngLocationSearchUrl);
-                        var abs_url = trailling_slash($window.location.href.replace($window.location.hash, ''));
+                        var location_href = attrs.ngLocationSearchUrl;
+                        var abs_url = $window.location.href.replace($window.location.hash, '');
                         var delay_change = attrs.ngLocationSearchDelay || 0;
 
                         //Deserializes a JSON search string.
@@ -75,7 +89,7 @@
                                 search_val = value;
                             }
 
-                            new_search[key] = (search_val && search_val !== '') ? search_val.toString() : default_value;
+                            new_search[key] = (search_val && search_val !== '') ? search_val.toString() : ((search_val === '') ? null : default_value);
                         });
 
                         var current_search = $location.search();
@@ -93,7 +107,6 @@
 
                         $timeout(function () {
 
-
                             //Redirect to search url
                             if (angular.isString(location_href) && location_href !== abs_url) {
 
@@ -102,7 +115,7 @@
                                 var is_abs_url = location_href.indexOf($location.protocol()) === 0;
 
                                 var path_url = $location.path();
-                                var hash_url = trailling_slash($window.location.hash.replace($location.url(), ''));
+                                var hash_url = untrailling_slash($window.location.hash.replace($location.url(), ''));
                                 var param_url = $httpParamSerializer(new_search);
 
                                 var new_href = '';
@@ -138,7 +151,7 @@
                                             new_href = path_url;
                                         }
                                         else {
-                                            new_href = path_url + "/" + location_href;
+                                            new_href = path_url + '/' + location_href;
                                         }
                                     }
                                     else {
