@@ -277,7 +277,7 @@
                          */
                         if (formCtrl) {
 
-                            var resetForm, changeForm, submitForm;
+                            var resetForm, changeForm, submitForm, applySubmit;
 
                             //Set the model change from location search object.
                             changeForm = function (loc_search) {
@@ -311,7 +311,7 @@
                                 }
                             };
 
-                            submitForm = function (data) {
+                            applySubmit = function (data) {
 
                                 var submit = scope.$eval(attrs.ngSubmit);
                                 var form_name = attrs.name;
@@ -331,14 +331,26 @@
                                 return submit;
                             };
 
+                            submitForm = function (timeout, data) {
+
+                                if (timeout) {
+                                    $timeout(function () {
+                                        applySubmit(data);
+                                    }, parseInt(timeout, 10));
+                                }
+                                else {
+                                    applySubmit(data);
+                                }
+                            };
+
                             resetForm = function () {
 
-                                submitForm(null);
+                                applySubmit(null);
                             };
 
                             //Attach event Submit Form
                             elem.on('submit', function () {
-                                submitForm();
+                                applySubmit();
                             });
 
                             //Change Form on location change start

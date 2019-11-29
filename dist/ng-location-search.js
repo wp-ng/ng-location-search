@@ -155,7 +155,7 @@
                         changeModel($location.search());
                     }
                     if (formCtrl) {
-                        var resetForm, changeForm, submitForm;
+                        var resetForm, changeForm, submitForm, applySubmit;
                         changeForm = function(loc_search) {
                             if (search_keys.length > 0) {
                                 var fields = scope.$eval(attrs.ngSubmit);
@@ -178,7 +178,7 @@
                                 setter(scope, search);
                             }
                         };
-                        submitForm = function(data) {
+                        applySubmit = function(data) {
                             var submit = scope.$eval(attrs.ngSubmit);
                             var form_name = attrs.name;
                             var form = scope.$eval(form_name);
@@ -192,11 +192,20 @@
                             }
                             return submit;
                         };
+                        submitForm = function(timeout, data) {
+                            if (timeout) {
+                                $timeout(function() {
+                                    applySubmit(data);
+                                }, parseInt(timeout, 10));
+                            } else {
+                                applySubmit(data);
+                            }
+                        };
                         resetForm = function() {
-                            submitForm(null);
+                            applySubmit(null);
                         };
                         elem.on("submit", function() {
-                            submitForm();
+                            applySubmit();
                         });
                         scope.$on("$locationChangeStart", function(event, newUrl, oldUrl, newState, oldState) {
                             changeForm($location.search());
