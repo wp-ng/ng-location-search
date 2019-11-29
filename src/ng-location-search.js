@@ -57,6 +57,11 @@
                         }
                     }
 
+                    function get_default_value(value, key) {
+
+                        return ((key && angular.isObject(value)) ? value[key] : value);
+                    }
+
                     var default_value = attrs.ngLocationSearchDefault ? scope.$eval(attrs.ngLocationSearchDefault) : null;
                     var search_keys;
 
@@ -92,7 +97,15 @@
 
                         //Apply key val on location search.
                         angular.forEach(search_keys, function (key, val) {
-                            var search_val = default_value;
+
+                            var default_val = get_default_value(default_value, key);
+
+                            //If value null reset the search
+                            if (!value) {
+                                default_val = null;
+                            }
+
+                            var search_val = default_val;
 
                             if (angular.isObject(value) && angular.isDefined(value[key]) ) {
                                 search_val = value[key];
@@ -105,7 +118,7 @@
                                 search_val = search_val.toString();
                             }
 
-                            new_search[key] = (search_val && search_val !== '') ? search_val.toString() : ((search_val === '') ? null : default_value);
+                            new_search[key] = (search_val && search_val !== '') ? search_val.toString() : ((search_val === '') ? null : default_val);
                         });
 
                         var current_search = $location.search();
@@ -203,12 +216,14 @@
                             //Find in url search params
                             angular.forEach(search_keys, function (key, val) {
 
+                                var default_val = get_default_value(default_value, key);
+
                                 if (angular.isObject(search)) {
-                                    search[key] = to_type((angular.isDefined(loc_search[key]) ? loc_search[key] : default_value), types[key]);
+                                    search[key] = to_type((angular.isDefined(loc_search[key]) ? loc_search[key] : default_val), types[key]);
                                 }
                                 else {
 
-                                    search = to_type((angular.isDefined(loc_search[key]) ? loc_search[key] : default_value), types[key]);
+                                    search = to_type((angular.isDefined(loc_search[key]) ? loc_search[key] : default_val), types[key]);
                                 }
                             });
 
@@ -272,14 +287,17 @@
                                     var types = attrs.ngLocationSearchTypes ? scope.$eval(attrs.ngLocationSearchTypes) : {};
 
                                     search = {
-                                        $resetForm: undefined
+                                        $resetForm: undefined,
+                                        $submitForm: submitForm
                                     };
 
                                     angular.forEach(search_keys, function(key, val) {
 
-                                        search[key] = to_type((angular.isDefined(loc_search[key]) ? loc_search[key] : default_value), types[key]);
+                                        var default_val = get_default_value(default_value, key);
 
-                                        if (search[key]) {
+                                        search[key] = to_type((angular.isDefined(loc_search[key]) ? loc_search[key] : default_val), types[key]);
+
+                                        if (angular.isDefined(loc_search[key])) {
                                             search.$resetForm = resetForm;
                                         }
                                     });
@@ -293,27 +311,35 @@
                                 }
                             };
 
-                            submitForm = function (event, data) {
+                            submitForm = function (data) {
 
-                                var submit = angular.isDefined(data) ? data : scope.$eval(attrs.ngSubmit);
+                                var submit = scope.$eval(attrs.ngSubmit);
                                 var form_name = attrs.name;
                                 var form = scope.$eval(form_name);
 
-                                if (angular.isDefined(submit) && (!form || form.$valid)) {
-                                    parseLocationSearch(submit);
+                                if (angular.isUndefined(data)) {
+                                    data = submit;
+                                }
+
+                                if (angular.isDefined(data) && (!form || form.$valid)) {
+                                    parseLocationSearch(data);
                                 }
                                 else {
                                     $rootScope.$broadcast('ngLocationSearchChangeError', 'form', form_name, form);
                                 }
+
+                                return submit;
                             };
 
                             resetForm = function () {
 
-                                submitForm(null, null);
+                                submitForm(null);
                             };
 
                             //Attach event Submit Form
-                            elem.on('submit', submitForm);
+                            elem.on('submit', function () {
+                                submitForm();
+                            });
 
                             //Change Form on location change start
                             scope.$on('$locationChangeStart', function(event, newUrl, oldUrl, newState, oldState) {
