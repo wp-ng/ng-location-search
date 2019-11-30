@@ -205,6 +205,8 @@
 
                         search_keys = scope.$eval(attrs.ngLocationSearch);
                         search_keys = angular.isArray(search_keys) ? search_keys : [attrs.ngLocationSearch];
+
+                        var timeout_debounce;
                         var search = default_value;
 
                         //Set the model change from location search object.
@@ -244,19 +246,41 @@
                          */
                         if ( modelCtrl ) {
 
+                            var applyModel = function (model, data) {
+
+                                if (model.$valid) {
+
+                                    parseLocationSearch(data);
+                                }
+                                else {
+                                    var model_name = attrs.name;
+                                    $rootScope.$broadcast('ngLocationSearchChangeError', 'model', model_name, model);
+                                }
+                            };
+
                             //Watch model change
                             scope.$watch(function () {
                                     return modelCtrl.$modelValue;
                                 },
                                 function (newVal, oldVal) {
 
-                                    if (newVal !== oldVal && modelCtrl.$valid) {
+                                    if (newVal !== oldVal) {
 
-                                        parseLocationSearch(newVal);
-                                    }
-                                    else {
-                                        var model_name = attrs.name;
-                                        $rootScope.$broadcast('ngLocationSearchChangeError', 'model', model_name, modelCtrl);
+                                        var timeout = attrs.ngLocationSearchDebounce;
+
+                                        if (timeout_debounce) {
+                                            $timeout.cancel(timeout_debounce);
+                                        }
+
+                                        if (timeout) {
+                                            timeout_debounce = $timeout(function () {
+
+                                                applyModel(modelCtrl, newVal);
+                                            }, parseInt(timeout, 10));
+                                        }
+                                        else {
+                                            applyModel(modelCtrl, newVal);
+                                        }
                                     }
                                 }
                             );
@@ -331,15 +355,23 @@
                                 return submit;
                             };
 
-                            submitForm = function (timeout, data) {
+                            submitForm = function (timeout) {
+
+                                timeout = angular.isNumber(timeout) ? timeout : attrs.ngLocationSearchDebounce;
+
+                                if (timeout_debounce) {
+                                    $timeout.cancel(timeout_debounce);
+                                }
 
                                 if (timeout) {
-                                    $timeout(function () {
-                                        applySubmit(data);
+
+                                    timeout_debounce = $timeout(function () {
+
+                                        applySubmit();
                                     }, parseInt(timeout, 10));
                                 }
                                 else {
-                                    applySubmit(data);
+                                    applySubmit();
                                 }
                             };
 
