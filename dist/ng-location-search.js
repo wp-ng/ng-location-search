@@ -60,6 +60,8 @@
                             search_val = value[key];
                         } else if (angular.isString(value)) {
                             search_val = value;
+                        } else if (angular.isNumber(value)) {
+                            search_val = value.toString();
                         }
                         if (angular.isArray(search_val)) {
                             search_val = search_val.toString();
